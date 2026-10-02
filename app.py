@@ -3,6 +3,7 @@ from __future__ import annotations
 import streamlit as st
 
 from excelauto.analyzer import WorkbookAnalyzer
+from excelauto.document_parser import parse_pdf
 from excelauto.input_parser import parse_input
 from excelauto.planner import InputPlanner
 from excelauto.writer import apply_changes
@@ -18,6 +19,7 @@ source_text = st.text_area(
     placeholder="例:\n請求先: 株式会社サンプル\n請求日: 2026/10/02",
     height=180,
 )
+source_pdf = st.file_uploader("Optional source PDF", type=["pdf"])
 
 if workbook_upload is not None:
     workbook_bytes = workbook_upload.getvalue()
@@ -29,8 +31,8 @@ if workbook_upload is not None:
             if sheet.writable_fields:
                 st.dataframe([field.as_dict() for field in sheet.writable_fields], use_container_width=True, hide_index=True)
 
-    if source_text.strip():
-        source_values = parse_input(source_text)
+    if source_text.strip() or source_pdf is not None:
+        source_values = parse_input(source_text) if source_text.strip() else parse_pdf(source_pdf.getvalue())
         plan = InputPlanner(analysis).create_plan(source_values)
         st.subheader("3. 入力候補")
         if not plan.changes:

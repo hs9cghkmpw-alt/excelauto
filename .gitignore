@@ -2,4 +2,6 @@
 __pycache__/
 .pytest_cache/
 *.py[cod]
-*.xlsx
+node_modules/
+tmp/
+fixtures/*.inspect.ndjson
